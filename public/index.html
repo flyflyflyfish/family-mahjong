@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>果果麻将</title>
+<meta name="theme-color" content="#082f29">
+<link rel="stylesheet" href="style.css?v=6.5.47">
+</head>
+<body>
+
+<!-- 首页 -->
+<div id="home" class="screen active">
+  <div class="panel">
+    <button id="btnFs2" class="fs-btn" title="全屏">⛶</button>
+    <div class="home-main">
+      <div class="brand-mark" aria-hidden="true">果</div>
+      <h1>果果麻将</h1>
+      <p class="brand-sub">家人朋友的私房牌局</p>
+      <p class="sub"><span>混儿牌</span><i></i><span>幺九必现</span><i></i><span>2–4 人联机</span></p>
+
+      <!-- 未登录: 登录/注册 -->
+      <div id="authView">
+        <div class="tabs">
+          <button id="tabLogin" class="tab active">登录</button>
+          <button id="tabReg" class="tab">注册</button>
+        </div>
+        <input id="authUser" type="text" maxlength="16" placeholder="账号 (2-16位)">
+        <input id="authPass" type="password" maxlength="32" placeholder="密码 (至少4位)">
+        <input id="authNick" type="text" maxlength="8" placeholder="牌桌昵称" class="hidden">
+        <button class="btn primary" id="btnAuth">登录</button>
+        <div class="divider">— 或游客直接玩 —</div>
+      </div>
+
+      <!-- 已登录: 个人条 (名字 + 图标功能组) -->
+      <div id="userView" class="hidden">
+        <div class="userbar">
+          <span id="myName"></span>
+          <span class="ubtns">
+            <button id="btnStats" class="icon-btn" title="查看战绩">📖</button>
+            <button id="btnPush" class="icon-btn" title="邀请通知" style="display:none">🔔<i></i></button>
+            <button id="btnWx" class="icon-btn" title="微信邀请提醒">💬</button>
+            <button id="btnLogout" class="icon-btn warn" title="退出登录">⏻</button>
+          </span>
+        </div>
+      </div>
+
+      <div class="row">
+        <input id="nick" type="text" maxlength="8" placeholder="你的昵称">
+      </div>
+      <button class="btn primary" id="btnCreate">🀄 创建房间</button>
+      <div class="row join-row">
+        <input id="joinCode" type="text" inputmode="numeric" maxlength="4" placeholder="输房号加入">
+        <button class="btn" id="btnJoin">加入</button>
+      </div>
+    </div>
+
+    <!-- 好友面板 (登录后显示) + 规则: 横屏时排右栏 -->
+    <div class="home-side">
+      <div id="friendPanel" class="hidden">
+        <div class="divider">— 好友 —</div>
+        <div class="row">
+          <input id="friendInput" type="text" maxlength="16" placeholder="输入对方的账号">
+          <button class="btn" id="btnAddFriend">加好友</button>
+        </div>
+        <ul id="friendList" class="plist"></ul>
+      </div>
+
+      <div id="homeErr" class="err"></div>
+      <button class="btn" id="btnRules">玩法规则</button>
+    </div>
+  </div>
+</div>
+
+<!-- 大厅 -->
+<div id="lobby" class="screen">
+  <div class="panel">
+    <button id="btnFs3" class="fs-btn" title="全屏">⛶</button>
+    <div class="lobby-main">
+      <h2>房间 <span id="lobbyCode" class="code">----</span></h2>
+      <p class="sub">把房间号告诉家人, 人齐了就开打</p>
+      <ul id="lobbyPlayers" class="plist"></ul>
+      <p id="lobbyWait" class="sub">等待房主开始…</p>
+      <p id="lobbySpect" class="sub hidden">👀 观战中：本局结束后自动正式加入</p>
+    </div>
+    <div class="lobby-actions">
+      <button class="btn primary" id="btnStart">开始游戏</button>
+      <div class="bot-row">
+        <button class="btn" id="btnAddBot0">+ 蓝色大肥鱼</button>
+        <button class="btn" id="btnAddBot1">+ 豆包</button>
+        <button class="btn" id="btnAddBot2">+ Z</button>
+      </div>
+      <button class="btn" id="btnInviteF">邀请好友进房</button>
+      <button class="btn danger" id="btnLeaveRoom">退出房间</button>
+      <button class="btn danger" id="btnDissolve">解散房间</button>
+    </div>
+  </div>
+</div>
+
+<!-- 牌桌：每个座位独立包含玩家信息、副露和牌河 -->
+<div id="game" class="screen">
+  <div id="topbar">
+    <div class="topbar-group">
+      <span id="tbWild"></span>
+      <span id="tbWall"></span>
+    </div>
+    <div class="topbar-actions">
+      <button id="btnVoiceFab" class="fs-btn js-voice-fab" title="语音通话" aria-label="语音通话">🎙</button>
+      <button id="btnFs" class="fs-btn" title="全屏" aria-label="全屏">⛶</button>
+      <button id="btnQuitGame" class="fs-btn quit-btn hidden" title="退出"></button>
+    </div>
+  </div>
+  <div id="tableWrap">
+    <div id="tableFelt">
+      <div class="wall" id="wallTop"></div>
+      <div class="wall" id="wallLeft"></div>
+      <div class="wall" id="wallRight"></div>
+      <div id="opponents"></div>
+      <div id="riverArea"></div>
+      <div id="compass">
+        <span class="wind wind-t" data-rel="2">北</span>
+        <span class="wind wind-r" data-rel="1">东</span>
+        <span class="wind wind-b" data-rel="0">南</span>
+        <span class="wind wind-l" data-rel="3">西</span>
+        <div class="compass-core">
+          <span class="clabel">余牌</span>
+          <b id="cbCount">0</b>
+          <div id="compassWild"></div>
+        </div>
+      </div>
+      <div id="turnHint"></div>
+    </div>
+  </div>
+  <div id="myArea">
+    <div id="actionBar" class="hidden"></div>
+    <div id="myTop">
+      <div class="my-player">
+        <div id="myAvatar">?</div>
+        <div class="my-player-meta">
+          <div class="my-name-line"><span id="myNameTag">我</span><span id="myDealer" class="tag hidden">庄</span></div>
+          <div id="myCoin">0</div>
+        </div>
+      </div>
+      <div id="myMelds"></div>
+      <div id="handTip">点选手牌，再点一次打出</div>
+    </div>
+    <div id="myHand"></div>
+  </div>
+</div>
+
+<!-- 聊天: 悬浮圆按钮 + 面板 -->
+<button id="tingFab" title="听牌分析" aria-label="听牌分析" style="display:none">听</button>
+<button id="statFab" title="战绩" aria-label="战绩" style="display:none">绩</button>
+<button id="bgmFab" title="声音设置" aria-label="声音设置">🔊</button>
+<button id="chatFab" title="聊天" aria-label="房间聊天" style="display:none">聊<i id="chatBadge" class="hidden"></i></button>
+<div id="chatPanel" class="hidden">
+  <div id="chatHead">
+    <b>房间聊天</b>
+    <button id="chatClose">✕</button>
+  </div>
+  <div id="chatList"></div>
+  <div id="chatQuickPop"></div>
+  <div id="chatInputRow">
+    <button id="chatQuickBtn" title="快捷用语">💬</button>
+    <input id="chatInput" type="text" maxlength="100" placeholder="说点什么…" autocomplete="off">
+    <button id="chatSend">发送</button>
+  </div>
+</div>
+
+<!-- 邀请弹窗 -->
+<div id="inviteModal" class="modal hidden">
+  <div class="panel">
+    <h2>📣 收到邀请</h2>
+    <p id="inviteText"></p>
+    <div class="row">
+      <button class="btn primary" id="btnInviteJoin">加入房间</button>
+      <button class="btn" id="btnInviteIgnore">忽略</button>
+    </div>
+  </div>
+</div>
+
+<!-- 邀请好友选择弹窗 -->
+<div id="pickModal" class="modal hidden">
+  <div class="panel">
+    <h2>邀请好友进房</h2>
+    <ul id="pickList" class="plist"></ul>
+    <button class="btn" id="btnPickClose">关闭</button>
+  </div>
+</div>
+
+<!-- 规则弹窗 -->
+<div id="rulesModal" class="modal hidden">
+  <div class="panel rules-panel">
+    <h2>果果麻将 · 玩法规则</h2>
+    <div class="rules-body">
+      <h3>🀄 牌</h3>
+      <p>万、饼(筒)、条各 1-9，加东南西北中发白，共 136 张。2-4 人都可以玩。</p>
+      <h3>✨ 混儿（万能牌）</h3>
+      <p>开局翻开一张牌亮出来，<b>混儿 = 亮出那张的下一张</b>（如四万→五万、九条→幺鸡、白板→红中、北风→东风，循环往复）。摸到与混儿相同的牌就是万能牌，可以当任何牌用；同面的 4 张全是混儿。若某人集齐了某种牌的 4 张（本该杠），第 4 张也自动变成混儿。<b>注意：混儿不能当作幺九来满足胡牌条件</b>，即使混儿本身是一万这类牌。</p>
+      <h3>🚪 胡牌条件（必须全部满足）</h3>
+      <p>① 标准牌型：4 组「顺子或刻子」+ 1 对将；<br>② <b>必须有幺九</b>：手里至少 1 张真幺九（万饼条里的 1 和 9，以及东南西北中发白都算）；<br>③ <b>必须开门</b>：至少吃或碰过一组亮在面前，全捂在手里不能胡；<br>④ <b>不能缺门</b>：万、饼、条三色都得有；<br>⑤ 至少一个刻子——例外：将牌（对子）是中发白时，可以全是顺子。</p>
+      <h3>🎯 大胡</h3>
+      <p>手里没有顺子，全是刻子加一个对子。大胡可以<b>插队优先胡</b>：多人同时要胡时，大胡的人先胡；多人同时大胡，仍按顺序算第一个。</p>
+      <h3>🀫 操作</h3>
+      <p>只有吃（只能吃上家打出的牌）和碰，<b>没有杠</b>。出牌：双击手牌（第一下选中抬起，再点一下打出）。一次只有一人胡，胡了本局就结束。</p>
+      <h3>💰 算钱</h3>
+      <p>普通胡基础 <b>1 元</b>，庄家 / 自摸 / 穷胡（手里没有任何混儿）/ 点炮，每满足一个翻一倍。<br>大胡基础 <b>15 元</b>，庄家 / 自摸 / 穷胡 / 点炮，每满足一个<b>加 5 元</b>（只加给点炮者，其他人付基础价）。<br>例：给庄家穷大胡点炮 → 点炮者付 30，另外两家付 25。庄家胡牌连庄，流局则下家坐庄。</p>
+    </div>
+    <button class="btn primary" id="btnRulesClose">我知道了</button>
+  </div>
+</div>
+
+<!-- 结算弹窗 -->
+<div id="resultModal" class="modal hidden">
+  <div class="panel">
+    <h2 id="resTitle"></h2>
+    <div id="resDetail"></div>
+    <div id="resHand"></div>
+    <div id="resTotals"></div>
+    <button class="btn primary" id="btnNext">下一局</button>
+    <button class="btn danger" id="btnQuitAfter">退出房间</button>
+  </div>
+</div>
+
+<!-- 听牌分析面板 -->
+<div id="tingPanel" class="hidden">
+  <div id="tingHead"><b>听牌分析</b><button id="tingClose">✕</button></div>
+  <div id="tingList"></div>
+</div>
+
+<!-- 语音通话弹窗 -->
+<div id="voiceModal" class="modal hidden">
+  <div class="panel">
+    <button id="btnVoiceCloseX" class="fs-btn" title="关闭">✕</button>
+    <h2>🎙 语音通话</h2>
+    <ul id="voiceMembers" class="plist"></ul>
+    <button class="btn primary" id="btnVoiceGo">进入语音通话</button>
+    <button class="btn hidden" id="btnVoiceMute">🎤 麦克风开启（点击静音）</button>
+    <button class="btn danger hidden" id="btnVoiceHang">挂断通话</button>
+    <p class="sub" id="voiceTip">进入后大家就能互相听到说话了</p>
+  </div>
+</div>
+
+<!-- 声音设置弹窗 -->
+<div id="soundModal" class="modal hidden">
+  <div class="panel">
+    <button id="btnSndCloseX" class="fs-btn" title="关闭">✕</button>
+    <h2>🔊 声音设置</h2>
+    <div class="snd-col snd-col-l">
+      <div class="snd-sec">
+        <button class="btn snd-toggle" id="btnSndToggle">🔊 声音已开启（点击关闭）</button>
+      </div>
+      <div class="snd-sec">
+        <p class="setLabel">🎵 背景音乐（含赢输结算曲）</p>
+        <div class="row" id="bgmSel">
+          <button class="btn" data-b="classic">经典曲库</button>
+          <button class="btn" data-b="fest">节日曲库</button>
+        </div>
+        <input type="range" id="musicVol" class="vol-slider" min="0" max="100" step="1" value="40">
+      </div>
+      <div class="snd-sec">
+        <p class="setLabel">🗣️ 语音播报（报牌/吃碰胡，音量同时管牌声）</p>
+        <input type="range" id="voiceVol" class="vol-slider" min="0" max="100" step="1" value="100">
+        <div class="row" id="voiceSel">
+          <button class="btn" data-v="m">男声</button>
+          <button class="btn" data-v="f">女声</button>
+        </div>
+      </div>
+    </div>
+    <div class="snd-col snd-col-r">
+      <div class="snd-sec">
+        <p class="setLabel">🎛 音效开关</p>
+        <button class="btn" id="btnFxReal" style="width:100%">🀄 牌声：开</button>
+        <button class="btn" id="btnOpSfx" style="width:100%; margin-top:8px">👆 选牌/操作音效：开</button>
+        <button class="btn" id="btnChatQuick" style="width:100%; margin-top:8px">💬 聊天语录语音：开</button>
+      </div>
+      <button class="btn primary" id="btnSoundClose">好的</button>
+    </div>
+  </div>
+</div>
+
+<!-- 房间管理弹窗 (房主/管理员: 请出·解散; 全员: 房号·邀请·加好友·退出·申请管理员) -->
+<div id="pActModal" class="modal hidden">
+  <div class="panel">
+    <button id="pActClose" class="fs-btn" title="关闭">✕</button>
+    <h2 id="pActName">玩家</h2>
+    <p class="setLabel" id="pActStatus">🟢 在线</p>
+    <button class="btn" id="pActRemind" style="width:100%">📩 发消息喊TA回来（推送+微信）</button>
+    <div class="row" id="pActRow" style="flex-wrap:wrap; margin-top:10px">
+      <button class="btn" data-k="flower">🌹 送花</button>
+      <button class="btn" data-k="egg">🥚 扔鸡蛋</button>
+      <button class="btn" data-k="water">💧 泼水</button>
+      <button class="btn" data-k="tea">🍵 倒茶</button>
+      <button class="btn" data-k="paw">🐾 挠一下</button>
+    </div>
+  </div>
+</div>
+<div id="manageModal" class="modal hidden">
+  <div class="panel">
+    <button id="btnManageCloseX" class="fs-btn" title="关闭">✕</button>
+    <div class="manage-main">
+      <h2>⚙ 房间管理</h2>
+      <div class="code-row">
+        <span class="setLabel">房间号</span>
+        <b id="manageCode" class="code">----</b>
+        <button class="mini primary" id="btnCopyCode">📋 复制房号</button>
+      </div>
+      <p class="sub">把房间号发给别人, 对方在首页「加入房间」输入房号即可进来</p>
+      <ul id="manageList" class="plist"></ul>
+      <div class="row" id="manageBotsRow" style="display:none">
+        <button class="btn" id="btnMBot0">+ 鱼</button>
+        <button class="btn" id="btnMBot1">+ 豆包</button>
+        <button class="btn" id="btnMBot2">+ Z</button>
+      </div>
+    </div>
+    <div class="manage-side">
+      <div class="divider">— 好友 —</div>
+      <div class="row">
+        <input id="manageFriendInput" type="text" maxlength="16" placeholder="输入对方账号加好友">
+        <button class="btn" id="btnManageAddFriend">加好友</button>
+      </div>
+      <ul id="manageFriendList" class="plist"></ul>
+      <button class="btn primary" id="btnManageInvite">📨 邀请好友进房</button>
+      <button class="btn" id="btnManageApply">🛡 申请管理员身份</button>
+      <button class="btn danger" id="btnManageDissolve">💥 解散房间（所有人回首页）</button>
+      <button class="btn danger" id="btnManageLeave">🚪 退出房间</button>
+      <button class="btn primary" id="btnManageClose">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 管理员申请审批弹窗 (房主: 100秒未处理自动通过) -->
+<div id="adminReqModal" class="modal hidden">
+  <div class="panel">
+    <h2>🛡 管理员申请</h2>
+    <p class="sub"><b id="adminReqName">有人</b> 申请成为管理员</p>
+    <p class="sub">通过后可踢人（含房主）和解散房间 · 100 秒未处理将自动通过</p>
+    <button class="btn primary" id="btnAdminReqOk">✅ 接受</button>
+    <button class="btn danger" id="btnAdminReqNo">❌ 拒绝</button>
+  </div>
+</div>
+
+<!-- 微信邀请提醒弹窗 -->
+<div id="wxModal" class="modal hidden">
+  <div class="panel">
+    <button id="btnWxCloseX" class="fs-btn" title="关闭">✕</button>
+    <h2>💬 微信邀请提醒</h2>
+    <div id="wxBind" class="hidden">
+      <!-- 需自备 wx-qr.png；本仓库不含任何二维码图片 -->
+      <img id="wxQr" src="wx-qr.png" alt="扫码关注" style="display:none">
+      <p class="wx-tip">如需微信提醒，请在部署时配置自己的公众号，并把二维码图片放到 <code>public/wx-qr.png</code>；随后在公众号内发送游戏账号完成绑定。</p>
+    </div>
+    <button class="btn primary" id="btnWxClose">关闭</button>
+  </div>
+</div>
+
+<!-- 战绩弹窗 -->
+<div id="statModal" class="modal hidden">
+  <div class="panel">
+    <button id="btnStatClose" class="fs-btn" title="关闭">✕</button>
+    <h2>📖 战绩</h2>
+    <div id="statList" class="stat-list"></div>
+  </div>
+</div>
+
+<div id="toast" class="hidden"></div>
+<script src="client.js?v=6.6.43"></script>
+</body>
+</html>

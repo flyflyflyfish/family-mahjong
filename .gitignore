@@ -1,0 +1,11 @@
+node_modules/
+backups/
+*.log
+accounts.json
+history.json
+secrets.json
+
+# 第三方音频/二维码素材不入库，需自行准备并确认授权
+public/music/
+public/voice/
+public/wx-qr.png

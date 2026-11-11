@@ -1,0 +1,15 @@
+{
+  "name": "family-mahjong",
+  "version": "1.0.0",
+  "description": "家规麻将 - 儿牌幺九麻将 2-4人联机",
+  "license": "SEE LICENSE IN LICENSE",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node server/test.js"
+  },
+  "dependencies": {
+    "express": "^4.19.0",
+    "ws": "^8.17.0"
+  }
+}

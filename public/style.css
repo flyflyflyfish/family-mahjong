@@ -1,0 +1,966 @@
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --gold: #e7c578;
+  --gold-bright: #ffe3a1;
+  --gold-dark: #9b7435;
+  --ink: #142b27;
+  --felt: #176b5c;
+  --ivory: #fffdf5;
+  --river-w: clamp(17px, 1.85vw, 24px);
+}
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  color: #fff;
+  background: #082f29;
+  overflow: hidden;
+}
+button, input { font: inherit; }
+button { touch-action: manipulation; }
+.screen { display: none; height: 100vh; height: 100dvh; }
+.screen.active { display: flex; flex-direction: column; }
+.hidden { display: none !important; }
+
+/* 首页与大厅 */
+#home, #lobby {
+  position: relative;
+  overflow-y: auto;
+  padding: 24px 0;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(74, 151, 116, .18), transparent 32%),
+    radial-gradient(circle at 85% 85%, rgba(210, 173, 91, .09), transparent 30%),
+    linear-gradient(145deg, #0c4439, #062a25 60%, #041e1b);
+}
+#home::before, #lobby::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .22;
+  background-image: linear-gradient(30deg, transparent 48%, rgba(231,197,120,.08) 49%, rgba(231,197,120,.08) 51%, transparent 52%);
+  background-size: 38px 66px;
+}
+.panel {
+  position: relative;
+  margin: auto;
+  width: min(92vw, 430px);
+  padding: 28px;
+  border: 1px solid rgba(231, 197, 120, .35);
+  border-radius: 24px;
+  background: linear-gradient(155deg, rgba(17, 61, 51, .96), rgba(5, 31, 27, .98));
+  box-shadow: 0 24px 70px rgba(0,0,0,.45), inset 0 1px rgba(255,255,255,.08), inset 0 0 0 5px rgba(255,255,255,.018);
+  text-align: center;
+}
+#home .panel { padding-top: 30px; }
+.brand-mark {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #f3d796;
+  border-radius: 18px;
+  color: #183b31;
+  background: linear-gradient(145deg, #ffe9b3, #c99d4c);
+  box-shadow: 0 7px 20px rgba(0,0,0,.3), inset 0 1px 2px #fff7dc;
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 37px;
+  font-weight: 900;
+  transform: rotate(-4deg);
+}
+h1 { font-size: 30px; line-height: 1.2; letter-spacing: 4px; color: #fff7df; }
+h2 { margin-bottom: 9px; font-size: 23px; color: #fff3d3; }
+.brand-sub { margin-top: 7px; color: rgba(255,244,215,.62); font-size: 13px; letter-spacing: 3px; }
+.sub { margin: 16px 0 20px; color: rgba(255,255,255,.55); font-size: 12px; }
+#home .sub { display: flex; align-items: center; justify-content: center; gap: 8px; }
+#home .sub i { width: 3px; height: 3px; border-radius: 50%; background: var(--gold); opacity: .65; }
+input {
+  width: 100%;
+  margin: 6px 0 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(231,197,120,.2);
+  border-radius: 11px;
+  outline: none;
+  background: rgba(255,255,255,.95);
+  color: #20352f;
+  text-align: center;
+  font-size: 16px;
+  transition: border-color .2s, box-shadow .2s;
+}
+input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(231,197,120,.15); }
+input::placeholder { color: #87958f; }
+.row { display: flex; gap: 10px; }
+.row input { flex: 1; min-width: 0; margin: 0; }
+.row .btn { width: 94px; margin: 0; }
+.divider { display: flex; align-items: center; gap: 10px; margin: 16px 0 12px; color: rgba(255,255,255,.42); font-size: 12px; }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(231,197,120,.22), transparent); }
+.btn {
+  width: 100%;
+  margin: 4px 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 11px;
+  background: rgba(255,255,255,.08);
+  color: #f8f3e7;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 650;
+  transition: transform .15s, filter .15s, background .15s;
+}
+.btn:hover { filter: brightness(1.08); background-color: rgba(255,255,255,.13); }
+.btn:active { transform: translateY(1px) scale(.99); }
+.btn.primary { border-color: #e9c776; background: linear-gradient(180deg, #f5d98e, #cda24e); color: #2d291c; box-shadow: 0 5px 16px rgba(0,0,0,.25), inset 0 1px #fff2c9; }
+.btn:disabled { opacity: .38; cursor: default; }
+.btn.danger { background: rgba(163,54,48,.8); color: #fff; }
+#resultModal .btn.danger { display: block; width: 100%; margin-top: 8px; }
+.err { min-height: 20px; margin-top: 8px; color: #ffaaa2; font-size: 13px; }
+.code { color: var(--gold-bright); font-size: 29px; letter-spacing: 5px; }
+.code-row { display: flex; align-items: center; gap: 10px; margin: 4px 0 6px; }
+.code-row .code { font-size: 24px; }
+.code-row .mini { flex: none; }
+.plist { list-style: none; margin: 10px 0 18px; }
+.plist li { margin: 7px 0; padding: 11px; border: 1px solid rgba(255,255,255,.06); border-radius: 11px; background: rgba(255,255,255,.065); font-size: 15px; }
+.tabs { display: flex; gap: 5px; margin-bottom: 14px; padding: 4px; border-radius: 12px; background: rgba(0,0,0,.2); }
+.tab { flex: 1; padding: 8px; border: 0; border-radius: 9px; background: transparent; color: rgba(255,255,255,.6); cursor: pointer; font-size: 14px; }
+.tab.active { background: rgba(231,197,120,.17); color: var(--gold-bright); box-shadow: inset 0 0 0 1px rgba(231,197,120,.3); }
+.userbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; padding: 8px 8px 8px 13px; border: 1px solid rgba(231,197,120,.28); border-radius: 12px; background: rgba(231,197,120,.08); color: var(--gold-bright); font-size: 14px; font-weight: 700; }
+#myName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ubtns { display: flex; gap: 6px; flex-shrink: 0; }
+.icon-btn { position: relative; width: 34px; height: 34px; padding: 0; border: 1px solid rgba(231,197,120,.3); border-radius: 10px; background: rgba(255,255,255,.07); color: var(--gold-bright); font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.icon-btn:active { transform: scale(.93); }
+.icon-btn.warn { color: rgba(255,190,180,.85); }
+#btnPush i { position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.28); }
+#btnPush.on i { background: #43d17c; box-shadow: 0 0 5px rgba(67,209,124,.8); }
+/* 主操作区: 创建房间为视觉中心, 加入为次级行 */
+#btnCreate { margin-top: 16px; padding: 14px; font-size: 17px; letter-spacing: 2px; }
+.join-row { margin-top: 10px; }
+.join-row input { flex: 1; }
+.join-row .btn { width: 84px; }
+.mini { padding: 5px 11px; border: 1px solid rgba(231,197,120,.4); border-radius: 8px; background: rgba(255,255,255,.9); color: #333; cursor: pointer; font-size: 12px; }
+.mini.primary { background: var(--gold); color: #2e291b; }
+.mini.bot-rm { margin-left: 8px; padding: 2px 9px; color: #a33; border-color: rgba(170,51,51,.35); }
+#friendPanel .row { margin-bottom: 8px; }
+#friendList { max-height: 180px; margin: 0; overflow-y: auto; }
+#friendList li { display: flex; align-items: center; gap: 6px; padding: 8px 4px; border-bottom: 1px dashed rgba(255,255,255,.1); }
+#friendList li .fname { flex: 1; text-align: left; }
+#friendList li .fstatus { color: #9aaba5; font-size: 12px; }
+#friendList li .fstatus.on { color: #8bd5ac; }
+#friendList li.empty { justify-content: center; color: #91a29c; font-size: 13px; }
+.fs-btn { display: grid; place-items: center; width: 34px; height: 34px; flex-shrink: 0; border: 1px solid rgba(231,197,120,.32); border-radius: 9px; background: rgba(3,27,23,.62); color: #f7e6b9; cursor: pointer; font-size: 17px; }
+.panel > .fs-btn { position: absolute; top: 14px; right: 14px; }
+.quit-btn { width: auto; padding: 0 11px; border-color: rgba(255,143,127,.35); background: rgba(118,43,37,.78); color: #ffd8cf; font-size: 12px; }
+
+/* 弹窗 */
+.modal { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(1,17,14,.76); backdrop-filter: blur(6px); }
+#pickModal { z-index: 115; } /* 从管理弹窗里点邀请好友: 选择窗要盖在管理弹窗之上 */
+.modal .panel { max-height: 90dvh; overflow-y: auto; }
+.rules-panel { display: flex; flex-direction: column; background: #f9f3e5; border-color: #c9b98a; text-align: left; }
+.rules-panel h2 { color: #285f4b; text-align: center; }
+.rules-body { padding-right: 5px; overflow-y: auto; color: #3c453f; font-size: 14px; line-height: 1.75; }
+.rules-body h3 { margin: 14px 0 4px; color: #1e6148; font-size: 16px; }
+.rules-body p { margin: 2px 0 8px; }
+.rules-body b { color: #a13f32; }
+#resTitle { color: var(--gold-bright); }
+#resDetail { margin: 10px 0; font-size: 14px; line-height: 1.7; }
+#resHand { display: flex; flex-wrap: wrap; justify-content: center; margin: 12px 0; }
+#resHand .tile { width: 32px; height: 43px; }
+#resTotals { margin: 8px 0 14px; text-align: left; font-size: 14px; }
+#resTotals div { display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px dashed rgba(255,255,255,.12); }
+.pos { color: #8bd5ac; } .neg { color: #ffaaa2; }
+#toast { position: fixed; top: 13%; left: 50%; z-index: 150; max-width: 86vw; padding: 11px 20px; transform: translateX(-50%); border: 1px solid rgba(231,197,120,.35); border-radius: 12px; background: rgba(4,28,24,.94); box-shadow: 0 8px 25px rgba(0,0,0,.35); color: #fff4d5; text-align: center; font-size: 14px; }
+
+/* 牌桌 */
+#game {
+  --my-height: 142px;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(63,155,127,.35), transparent 53%),
+    radial-gradient(ellipse at center, #1b7563 0%, #10584d 56%, #073c35 100%);
+}
+#game::before {
+  content: "";
+  position: absolute;
+  inset: 42px 10px 8px;
+  border: 1px solid rgba(231,197,120,.19);
+  border-radius: 42px;
+  box-shadow: inset 0 0 80px rgba(0,0,0,.18), 0 0 0 5px rgba(2,40,34,.25);
+  pointer-events: none;
+}
+#topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 42px; padding: 5px 14px 5px 64px; background: linear-gradient(180deg, rgba(2,29,25,.88), rgba(2,29,25,.2)); } /* 左侧 64px 专属区给 #bgmFab 声音按钮, 避免遮挡亮牌/混儿信息 (v6.6.33) */
+.topbar-group, .topbar-actions { display: flex; align-items: center; gap: 6px; }
+#topbar span { padding: 4px 10px; border: 1px solid rgba(231,197,120,.16); border-radius: 9px; background: rgba(3,35,29,.52); color: #e6e6d9; white-space: nowrap; font-size: 11px; }
+#topbar span b { color: var(--gold-bright); font-weight: 700; }
+#tbWild { color: #f4dfaa !important; }
+#tableWrap { position: absolute; top: 43px; right: 20px; bottom: var(--my-height); left: 20px; }
+#tableFelt { position: relative; display: grid; grid-template-areas: "left top right" "left center right" "left self right"; grid-template-columns: minmax(150px,.92fr) minmax(250px,1.55fr) minmax(150px,.92fr); grid-template-rows: minmax(94px,1.08fr) minmax(76px,.8fr) minmax(68px,.82fr); gap: 6px 12px; width: 100%; height: 100%; }
+#tableFelt::before { content: ""; position: absolute; top: 50%; left: 50%; z-index: 0; width: min(36vw,360px); aspect-ratio: 1; transform: translate(-50%,-50%); border: 1px solid rgba(255,255,255,.035); border-radius: 50%; box-shadow: 0 0 0 20px rgba(255,255,255,.012), inset 0 0 50px rgba(0,0,0,.06); pointer-events: none; }
+#tableFelt::after { content: "果果麻将"; position: absolute; top: 50%; left: 50%; z-index: 0; transform: translate(-50%,-50%) rotate(-5deg); color: rgba(255,255,255,.035); white-space: nowrap; font-size: clamp(22px,3vw,38px); font-weight: 900; letter-spacing: 9px; pointer-events: none; }
+#opponents, #riverArea { display: contents; }
+
+/* 牌墙仅作桌面边缘装饰，不参与座位布局 */
+.wall { position: absolute; z-index: 1; display: flex; gap: 2px; pointer-events: none; opacity: .82; }
+#wallTop { top: -2px; left: 50%; transform: translateX(-50%); }
+#wallLeft { top: 50%; left: -8px; flex-direction: column; transform: translateY(-50%); }
+#wallRight { top: 50%; right: -8px; flex-direction: column; transform: translateY(-50%); }
+.wtile { width: 13px; height: 19px; flex-shrink: 0; border: 1px solid rgba(230,240,211,.48); border-radius: 2px; background: linear-gradient(180deg,#eef0d9 0 25%,#438563 26% 38%,#236342 39% 100%); box-shadow: 0 2px 2px rgba(0,0,0,.35); }
+#wallLeft .wtile, #wallRight .wtile { width: 19px; height: 13px; background: linear-gradient(90deg,#eef0d9 0 25%,#438563 26% 38%,#236342 39% 100%); }
+.wall.vacant { filter: grayscale(1); opacity: .35; } /* 没人坐的一侧: 灰色牌背 */
+
+/* 座位组件 */
+.opp { position: relative; z-index: 5; display: flex; min-width: 0; min-height: 0; flex-direction: column; gap: 5px; align-self: stretch; }
+.opp-2 { grid-area: top; width: min(100%,560px); justify-self: center; padding-top: 9px; }
+.opp-1 { grid-area: right; justify-content: center; }
+.opp-3 { grid-area: left; justify-content: center; }
+.seat-topline { display: flex; min-width: 0; align-items: center; gap: 8px; }
+.player-card { display: flex; flex: 0 0 auto; align-items: center; gap: 7px; min-width: 104px; padding: 5px 9px 5px 5px; border: 1px solid rgba(231,197,120,.24); border-radius: 13px; background: linear-gradient(145deg,rgba(5,42,35,.88),rgba(3,28,24,.8)); box-shadow: 0 4px 12px rgba(0,0,0,.22), inset 0 1px rgba(255,255,255,.05); transition: border-color .2s, box-shadow .2s; }
+.avatar { display: grid; place-items: center; width: 34px; height: 34px; flex-shrink: 0; border: 1px solid #caaa62; border-radius: 10px; background: linear-gradient(145deg,#548d70,#234e3e); color: #fff0c5; font-size: 15px; font-weight: 800; box-shadow: inset 0 1px rgba(255,255,255,.15); }
+.opp-mid { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+.oname { overflow: hidden; color: #fff9e9; white-space: nowrap; text-overflow: ellipsis; font-size: 12px; font-weight: 700; }
+.tag { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; margin-left: 4px; padding: 0 4px; border-radius: 5px; background: #bd8131; color: #fff3c4; vertical-align: 1px; font-size: 10px; font-style: normal; }
+.tag.off { background: #714a45; color: #ffd4cc; }
+.coin { color: #f4d88e; white-space: nowrap; font-size: 11px; font-weight: 700; }
+.coin::before, #myCoin::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border: 1px solid #ffe08a; border-radius: 50%; background: #d5a941; box-shadow: inset 0 0 0 1px #a87828; vertical-align: -1px; }
+.opp.turn .player-card { border-color: #ffdf8c; box-shadow: 0 0 0 2px rgba(255,215,122,.28), 0 0 18px rgba(255,205,92,.24); }
+.opp.turn .avatar { background: linear-gradient(145deg,#8c7540,#4a5838); }
+.opp.off .player-card { opacity: .52; }
+.om { display: flex; min-width: 0; flex: 1; flex-wrap: wrap; align-content: center; align-items: center; gap: 4px; }
+.meld-mini { display: inline-flex; align-items: center; gap: 1px; padding: 3px; border: 1px solid rgba(231,197,120,.13); border-radius: 6px; background: rgba(2,38,31,.25); }
+.meld-kind { margin-right: 2px; color: #edd59a; font-size: 9px; font-style: normal; }
+.meld-mini .tile { width: 17px; height: 23px; margin: 0; border-radius: 3px; }
+.opp-1 .seat-topline, .opp-3 .seat-topline { align-items: flex-start; flex-direction: column; gap: 5px; }
+.opp-1 .om, .opp-3 .om { flex: none; max-width: 100%; }
+.opp-1 .player-card, .opp-3 .player-card { min-width: 98px; }
+
+/* 每个座位的弃牌跟随座位，不再单独漂浮 */
+.river { display: grid; grid-template-columns: repeat(8,var(--river-w)); gap: 3px; width: max-content; max-width: 100%; margin: 0 auto; align-content: start; justify-content: center; }
+
+/* 对手手牌牌背: 数量随吃/碰/摸/打实时增减 */
+.handbacks { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; width: max-content; max-width: 100%; margin: 0 auto; }
+.handbacks i { width: 12px; height: 16px; flex-shrink: 0; border: 1px solid rgba(230,240,211,.45); border-radius: 2px; background: linear-gradient(180deg,#eef0d9 0 25%,#438563 26% 38%,#236342 39% 100%); box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+/* 空座位: 灰色牌背 */
+.opp-empty { justify-content: center; }
+.opp-empty .handbacks { filter: grayscale(1); opacity: .35; }
+.opp-2 .river { grid-template-columns: repeat(12,var(--river-w)); }
+.opp-1 .river, .opp-3 .river { grid-template-columns: repeat(4,var(--river-w)); }
+.river .tile { width: var(--river-w); height: calc(var(--river-w) * 1.34); margin: 0; border-radius: 3px; cursor: default; }
+.river-row { position: relative; z-index: 4; min-width: 0; min-height: 0; }
+.rr-0 { grid-area: self; display: flex; align-items: flex-start; justify-content: center; padding-top: 3px; }
+.rr-0 .river { grid-template-columns: repeat(12,var(--river-w)); }
+.river .tile.last { z-index: 2; outline: 2px solid #ffd174; outline-offset: 2px; animation: lastGlow 1.8s ease-in-out infinite; }
+.river .tile.last::before { content: ""; position: absolute; top: -9px; left: 50%; width: 0; height: 0; transform: translateX(-50%); border-right: 4px solid transparent; border-bottom: 6px solid #ffd174; border-left: 4px solid transparent; }
+@keyframes lastGlow { 50% { filter: brightness(1.12); } }
+
+/* 中央罗盘 */
+#compass { position: relative; grid-area: center; z-index: 6; align-self: center; justify-self: center; width: 126px; height: 98px; border: 1px solid #d2ab5e; border-radius: 25px; background: linear-gradient(145deg,#445853,#101e1c 60%,#07110f); box-shadow: 0 8px 18px rgba(0,0,0,.36), inset 0 0 0 4px #1e3530, inset 0 1px 0 5px rgba(255,255,255,.1); clip-path: polygon(20% 0,80% 0,100% 22%,100% 78%,80% 100%,20% 100%,0 78%,0 22%); }
+.compass-core { position: absolute; inset: 15px 30px; display: flex; align-items: center; justify-content: center; flex-direction: column; border: 1px solid rgba(231,197,120,.23); border-radius: 10px; background: radial-gradient(circle at 45% 30%,#28473f,#0a201c); }
+#compass .clabel { color: #91b4a7; font-size: 8px; letter-spacing: 2px; }
+#cbCount { color: #ffe38f; font-size: 24px; line-height: 1.05; text-shadow: 0 0 12px rgba(255,215,120,.25); }
+#compassWild { position: absolute; right: -25px; bottom: -8px; display: flex; align-items: center; }
+#compassWild .tile { width: 18px; height: 24px; margin: 0; border-radius: 3px; }
+#compassWild .tile.wild::after { top: -5px; right: -5px; width: 12px; height: 12px; font-size: 7px; }
+.wind { position: absolute; z-index: 2; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; color: #78978c; font-family: "STKaiti","KaiTi",serif; font-size: 11px; transition: .2s; }
+.wind-t { top: 3px; left: 54px; } .wind-r { top: 40px; right: 5px; } .wind-b { bottom: 3px; left: 54px; } .wind-l { top: 40px; left: 5px; }
+.wind.active { background: #d8b35f; color: #203c32; box-shadow: 0 0 9px rgba(255,218,131,.5); font-weight: 900; }
+.wind.dealer:not(.active) { color: #f2cf7c; }
+#turnHint { position: absolute; bottom: 4px; left: 50%; z-index: 8; max-width: 80%; padding: 4px 12px; transform: translateX(-50%); border: 1px solid rgba(231,197,120,.16); border-radius: 12px; background: rgba(4,40,33,.55); color: #f6e4b7; white-space: nowrap; font-size: 11px; letter-spacing: .5px; pointer-events: none; }
+#turnHint:empty { display: none; }
+
+/* 麻将牌：全矢量牌面 + 象牙牌体 + 玉色牌侧 */
+.tile { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 57px; margin: 2px; flex-shrink: 0; border: 1px solid #c8c0a9; border-radius: 6px; background: linear-gradient(145deg,#fffef9 0%,#fffdf4 50%,#e9e2cd 100%); box-shadow: 0 3px 0 #b7b093, 0 5px 0 #3b7255, 0 8px 10px rgba(0,0,0,.32), inset 0 1px 1px #fff; cursor: pointer; user-select: none; transition: transform .14s, filter .14s, box-shadow .14s; }
+.tile::before { content: ""; position: absolute; inset: 2px; border: 1px solid rgba(255,255,255,.7); border-radius: 4px; pointer-events: none; }
+.tile svg { position: relative; z-index: 1; width: 88%; height: 88%; pointer-events: none; filter: drop-shadow(0 .3px 0 rgba(255,255,255,.5)); }
+.tile.wild { border-color: #d0a43d; background: linear-gradient(145deg,#fffdf2,#fff2bd 58%,#ead48a); box-shadow: 0 3px 0 #c1a150, 0 5px 0 #537348, 0 8px 10px rgba(0,0,0,.32), inset 0 1px 1px #fff; }
+.tile.wild::after { content: "混"; position: absolute; top: -6px; right: -6px; z-index: 4; display: grid; place-items: center; width: 17px; height: 17px; border: 1px solid #ffe08a; border-radius: 50%; background: linear-gradient(145deg,#e9b94e,#a86b20); box-shadow: 0 2px 4px rgba(0,0,0,.35); color: #fff9df; font-size: 9px; font-weight: 900; }
+#myHand .tile:hover { filter: brightness(1.035); }
+.tile.sel { transform: translateY(-12px); border-color: #f0c85e; box-shadow: 0 0 0 3px #ffe092, 0 4px 0 #b7b093, 0 7px 0 #3b7255, 0 14px 16px rgba(0,0,0,.42); }
+
+/* 自己的信息、副露与手牌 */
+#myArea { position: absolute; right: 0; bottom: 0; left: 0; z-index: 20; height: var(--my-height); padding: 4px 14px calc(8px + env(safe-area-inset-bottom)); background: linear-gradient(180deg,transparent,rgba(3,30,25,.45) 24%,rgba(2,23,20,.88)); }
+#myTop { display: flex; height: 45px; align-items: center; gap: 12px; }
+.my-player { display: flex; flex: 0 0 auto; align-items: center; gap: 7px; }
+#myAvatar { display: grid; place-items: center; width: 38px; height: 38px; border: 2px solid #d8b668; border-radius: 11px; background: linear-gradient(145deg,#668d67,#294e3c); color: #fff1c4; font-size: 16px; font-weight: 850; }
+.my-player-meta { display: flex; flex-direction: column; gap: 3px; }
+.my-name-line { display: flex; align-items: center; max-width: 110px; color: #fff6de; white-space: nowrap; font-size: 12px; font-weight: 700; }
+#myNameTag { overflow: hidden; text-overflow: ellipsis; }
+#myCoin { color: #f4d78a; font-size: 11px; font-weight: 700; }
+#myMelds { display: flex; min-width: 0; flex: 1; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+#myMelds::-webkit-scrollbar { display: none; }
+#myMelds .tile { width: 24px; height: 32px; margin: 0; border-radius: 4px; }
+#myMelds .meld-mini { flex-shrink: 0; }
+#myMelds .meld-mini .tile { width: 24px; height: 32px; }
+.mlabel { flex-shrink: 0; margin-right: 4px; color: rgba(246,229,185,.66); font-size: 10px; white-space: nowrap; }
+#handTip { flex: 0 0 auto; color: rgba(255,255,255,.38); font-size: 10px; white-space: nowrap; }
+#myHand { --tw: clamp(34px,5.2vw,56px); display: flex; min-height: calc(var(--tw) * 1.36 + 13px); align-items: flex-end; justify-content: center; flex-wrap: nowrap; }
+#myHand .tile { width: var(--tw); height: calc(var(--tw) * 1.36); margin: 1px; }
+#myHand .tile.drawn { margin-left: clamp(7px,1.3vw,17px); }
+#actionBar { position: absolute; right: 0; bottom: calc(100% + 6px); left: 0; z-index: 30; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 6px 12px; }
+#actionBar .btn { width: auto; min-width: 70px; margin: 0; padding: 9px 20px; border-radius: 20px; box-shadow: 0 5px 14px rgba(0,0,0,.32); font-size: 14px; }
+#actionBar .btn.hu { border-color: #ffb29d; background: linear-gradient(#e76c52,#b63e31); color: #fff; }
+#actionBar .btn.peng { border-color: #ffe08a; background: linear-gradient(#f4d681,#c99a3f); color: #372a16; }
+#actionBar .btn.chi { border-color: #9bd3ae; background: linear-gradient(#4b9f6e,#26754d); color: #fff; }
+#actionBar .btn.pass { background: rgba(5,44,37,.9); }
+
+/* 聊天 */
+#statFab { position: fixed; right: 16px; bottom: max(12px, min(calc(var(--my-height,142px) + 64px + env(safe-area-inset-bottom)), calc(100dvh - 192px))); z-index: 45; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid #cbae65; border-radius: 50%; background: linear-gradient(145deg,#315f4c,#123d31); box-shadow: 0 5px 15px rgba(0,0,0,.35); color: #ffe6ae; cursor: pointer; font-size: 15px; font-weight: 800; } /* max 下限: 微信横屏等超矮视口下 100dvh-192 会变负, 悬浮钮别跑出屏幕 (v6.6.35) */
+#tingFab { position: fixed; right: 16px; bottom: min(calc(var(--my-height,142px) + 116px + env(safe-area-inset-bottom)), calc(100dvh - 140px)); z-index: 45; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid #cbae65; border-radius: 50%; background: linear-gradient(145deg,#315f4c,#123d31); box-shadow: 0 5px 15px rgba(0,0,0,.35); color: #ffe6ae; cursor: pointer; font-size: 15px; font-weight: 800; }
+#tingPanel { position: fixed; right: 14px; bottom: min(calc(var(--my-height,142px) + 168px + env(safe-area-inset-bottom)), calc(100dvh - 44px - 46vh)); z-index: 90; width: min(340px,calc(100vw - 28px)); max-height: 46vh; overflow-y: auto; border: 1px solid rgba(231,197,120,.55); border-radius: 15px; background: linear-gradient(180deg,#194d3e,#092f27); box-shadow: 0 15px 40px rgba(0,0,0,.5); }
+#tingHead { display: flex; align-items: center; justify-content: space-between; padding: 9px 13px; border-bottom: 1px solid rgba(231,197,120,.2); background: rgba(0,0,0,.16); color: #ffe6ae; font-size: 13px; }
+#tingClose { border: 0; background: none; color: #eee4cf; cursor: pointer; font-size: 16px; padding: 4px 6px; }
+#tingList { padding: 8px 11px 11px; display: flex; flex-direction: column; gap: 7px; }
+.ting-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-size: 12px; color: #e8ddc4; line-height: 1.5; }
+.ting-drop { color: #ffe6ae; font-weight: 700; }
+.ting-n { color: #7fd6a8; font-weight: 700; }
+.ting-waits { color: #cfc4a6; }
+.ting-tile { color: #ffe9b8; font-weight: 700; }
+.ting-tile.ting-dead { color: #9a8f7d; font-weight: 400; }
+.ting-auto { margin-top: 9px; padding-top: 9px; border-top: 1px dashed rgba(231,197,120,.25); text-align: center; }
+.ting-auto .btn { width: 100%; box-sizing: border-box; font-size: 13px; padding: 7px 10px; }
+#chatFab { position: fixed; right: 16px; bottom: max(12px, min(calc(var(--my-height,142px) + 12px + env(safe-area-inset-bottom)), calc(100dvh - 244px))); z-index: 45; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid #cbae65; border-radius: 50%; background: linear-gradient(145deg,#315f4c,#123d31); box-shadow: 0 5px 15px rgba(0,0,0,.35); color: #fff; cursor: pointer; font-size: 18px; }
+#bgmFab { position: fixed; left: 14px; top: 14px; z-index: 46; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid #cbae65; border-radius: 50%; background: linear-gradient(145deg,#315f4c,#123d31); box-shadow: 0 5px 15px rgba(0,0,0,.35); color: #fff; cursor: pointer; font-size: 17px; }
+#chatBadge { position: absolute; top: -4px; right: -4px; display: flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: #d95647; color: #fff; font-size: 10px; font-style: normal; font-weight: 800; }
+#chatPanel { position: fixed; right: 14px; bottom: max(8px, min(calc(var(--my-height,142px) + 64px + env(safe-area-inset-bottom)), calc(100dvh - 44px - 68vh))); z-index: 90; display: flex; width: min(330px,calc(100vw - 28px)); height: max(210px, min(420px,68vh)); max-height: max(210px, calc(100dvh - var(--my-height,142px) - 76px)); flex-direction: column; overflow: hidden; border: 1px solid rgba(231,197,120,.55); border-radius: 17px; background: linear-gradient(180deg,#194d3e,#092f27); box-shadow: 0 15px 40px rgba(0,0,0,.5); } /* max(170px) 下限: 微信横屏视口仅~240px 高时公式会算出 50px 把面板压扁只剩标题 (v6.6.35), 宁可盖住部分牌桌也要保证输入可用 */
+#chatHead { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; padding: 10px 13px; border-bottom: 1px solid rgba(231,197,120,.2); background: rgba(0,0,0,.16); color: #ffe6ae; font-size: 13px; }
+#chatClose { min-width: 38px; min-height: 38px; margin: -6px -8px -6px 0; display: grid; place-items: center; border: 1px solid rgba(231,197,120,.3); border-radius: 9px; background: rgba(231,197,120,.12); color: #eee4cf; cursor: pointer; font-size: 16px; }
+#chatList { display: flex; flex: 1; flex-direction: column; gap: 7px; overflow-y: auto; padding: 10px; }
+.chat-msg { max-width: 82%; align-self: flex-start; }
+.chat-msg.mine { align-self: flex-end; }
+.cm-name { margin: 0 3px 3px; color: rgba(255,233,176,.65); font-size: 10px; }
+.cm-name span { margin-left: 5px; opacity: .6; }
+.chat-msg.mine .cm-name { text-align: right; }
+.cm-bubble { padding: 7px 10px; border-radius: 11px 11px 11px 3px; background: rgba(255,255,255,.93); color: #20362e; font-size: 13px; line-height: 1.4; word-break: break-word; }
+.chat-msg.mine .cm-bubble { border-radius: 11px 11px 3px 11px; background: #e9c778; color: #3c311b; }
+#chatInputRow { display: flex; gap: 7px; padding: 9px; border-top: 1px solid rgba(231,197,120,.18); }
+#chatQuickBtn { flex-shrink: 0; width: 38px; padding: 0; border: 0; border-radius: 10px; background: rgba(231,197,120,.16); color: #ffe6ae; cursor: pointer; font-size: 17px; }
+#chatQuickBtn.on { background: #dfba68; color: #3e321c; }
+#chatQuickPop { display: none; flex-direction: column; gap: 5px; max-height: 34vh; margin: 0 9px; padding: 8px; overflow-y: auto; border: 1px solid rgba(231,197,120,.25); border-radius: 10px; background: rgba(5,31,27,.96); }
+#chatQuickPop.open { display: flex; }
+#chatQuickPop button { padding: 8px 10px; border: 0; border-radius: 9px; background: rgba(231,197,120,.12); color: #f2e8cf; cursor: pointer; font-size: 13px; text-align: left; }
+#chatQuickPop button:active { background: #dfba68; color: #3e321c; }
+#chatInput { flex: 1; min-width: 0; margin: 0; padding: 8px 10px; text-align: left; font-size: 13px; }
+#chatSend { padding: 0 15px; border: 0; border-radius: 10px; background: #dfba68; color: #3e321c; cursor: pointer; font-size: 13px; font-weight: 700; }
+
+/* 战绩 */
+.stat-list { max-height: 55vh; margin-top: 8px; overflow-y: auto; text-align: left; }
+.stat-day { display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1; padding: 8px 4px; background: linear-gradient(180deg,rgba(5,31,27,.98),rgba(5,31,27,.92)); color: #ffe6ae; font-weight: 800; border-bottom: 1px solid rgba(231,197,120,.28); }
+.stat-day b { font-size: 14px; }
+.stat-row { display: flex; align-items: center; gap: 8px; padding: 8px 4px; border-bottom: 1px dashed rgba(255,255,255,.09); font-size: 13px; }
+.stat-row:last-child { border-bottom: 0; }
+.st-time { flex-shrink: 0; color: #9aaba5; font-size: 11px; }
+.st-desc { display: flex; min-width: 0; flex: 1; align-items: center; flex-wrap: wrap; gap: 3px; color: #e9e4d2; }
+.st-desc .tag { margin: 0; }
+.st-room { color: rgba(255,255,255,.35); font-size: 10px; font-style: normal; }
+.stat-row b { flex-shrink: 0; min-width: 34px; text-align: right; font-size: 14px; }
+.stat-empty { padding: 24px 0; color: #91a29c; font-size: 13px; }
+
+/* 战绩: 可点击行与详情 */
+.stat-row.clickable { cursor: pointer; border-radius: 8px; }
+.stat-row.clickable:hover { background: rgba(255,255,255,.06); }
+.st-win { margin-left: auto; margin-right: 4px; flex-shrink: 0; color: #f5d78a; font-size: 11px; font-style: normal; font-weight: 700; }
+.st-win.draw { color: #8ba39b; }
+.stat-back { margin: 4px 0 10px; }
+.stat-detail-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 4px 4px 10px; color: #ffe6ae; font-size: 14px; border-bottom: 1px solid rgba(231,197,120,.28); }
+.stat-detail-head .st-room { font-size: 11px; }
+.stat-calc { width: 100%; color: #d9ceb2; font-size: 12px; }
+.stat-deltas { display: flex; flex-direction: column; padding: 8px 0; border-bottom: 1px solid rgba(231,197,120,.2); }
+.stat-delta-row { display: flex; align-items: center; gap: 10px; padding: 5px 4px; font-size: 13px; color: #e9e4d2; }
+.sd-name { flex-shrink: 0; min-width: 92px; display: flex; align-items: center; gap: 4px; font-weight: 700; }
+.sd-name .tag { margin: 0; }
+.sd-desc { flex: 1; min-width: 0; color: #b9c4bc; font-size: 12px; }
+.stat-delta-row b { flex-shrink: 0; min-width: 34px; text-align: right; font-size: 14px; }
+.stat-mine { padding: 10px 0 4px; }
+.stat-mine-title { color: #ffe6ae; font-size: 12px; font-weight: 800; margin-bottom: 7px; }
+.stat-melds { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 7px; }
+.stat-hand { display: flex; flex-wrap: wrap; gap: 4px; }
+
+/* 横屏手机与矮窗口 */
+@media (max-height: 560px) and (orientation: landscape) {
+  :root { --river-w: clamp(14px,1.75vw,20px); }
+  #game { --my-height: 112px; }
+  #topbar { min-height: 36px; padding: 3px 12px 3px 58px; }
+  #bgmFab { left: 12px; top: 10px; width: 34px; height: 34px; font-size: 14px; }
+  #topbar span { padding: 3px 8px; font-size: 10px; }
+  #topbar .fs-btn { width: 29px; height: 29px; }
+  #tableWrap { top: 35px; right: 16px; bottom: var(--my-height); left: 16px; }
+  #tableFelt { grid-template-columns: minmax(126px,.85fr) minmax(210px,1.5fr) minmax(126px,.85fr); grid-template-rows: minmax(76px,1.08fr) minmax(62px,.75fr) minmax(56px,.72fr); gap: 3px 9px; }
+  .opp-2 { padding-top: 5px; }
+  .seat-topline { gap: 5px; }
+  .player-card { min-width: 91px; gap: 5px; padding: 3px 7px 3px 3px; border-radius: 10px; }
+  .avatar { width: 28px; height: 28px; border-radius: 8px; font-size: 13px; }
+  .oname, .coin { font-size: 10px; }
+  .meld-mini { padding: 2px; }
+  .meld-mini .tile { width: 14px; height: 19px; }
+  .meld-kind { display: none; }
+  .handbacks i { width: 10px; height: 14px; }
+  .river { gap: 2px; }
+  #compass { width: 108px; height: 82px; }
+  .compass-core { inset: 13px 27px; }
+  #cbCount { font-size: 20px; }
+  .wind-t, .wind-b { left: 45px; }
+  .wind-r, .wind-l { top: 32px; }
+  #turnHint { bottom: 1px; padding: 2px 9px; font-size: 9px; }
+  #myArea { padding: 2px 10px calc(5px + env(safe-area-inset-bottom)); }
+  #myTop { height: 34px; gap: 8px; }
+  #myAvatar { width: 30px; height: 30px; border-radius: 8px; font-size: 13px; }
+  .my-name-line, #myCoin { font-size: 10px; }
+  #myMelds .tile, #myMelds .meld-mini .tile { width: 19px; height: 26px; }
+  #handTip { font-size: 9px; }
+  #myHand { --tw: clamp(31px,5vw,46px); min-height: calc(var(--tw) * 1.34 + 9px); }
+  #actionBar { bottom: calc(100% + 2px); padding: 3px; }
+  #actionBar .btn { min-width: 58px; padding: 6px 15px; font-size: 12px; }
+  #chatFab { width: 38px; height: 38px; right: 12px; font-size: 16px; }
+}
+
+/* 竖屏：三家保持独立座位；自己的手牌每排最多 7 张，两排居中显示 */
+@media (orientation: portrait) {
+  :root { --river-w: clamp(14px,4vw,20px); }
+  #game {
+    --hand-tw: min(48px,calc((100vw - 30px)/7));
+    --my-height: calc(var(--hand-tw) * 2.72 + 67px);
+  }
+  #game::before { inset: 42px 5px 6px; border-radius: 28px; }
+  #topbar { padding: 5px 8px 5px 58px; }
+  #bgmFab { left: 12px; top: 12px; width: 34px; height: 34px; font-size: 14px; }
+  #topbar span { padding: 4px 7px; font-size: 9px; }
+  #tbWall { display: none; }
+  #tableWrap { top: 43px; right: 10px; bottom: var(--my-height); left: 10px; }
+  #tableFelt { grid-template-columns: minmax(82px,.82fr) minmax(132px,1.35fr) minmax(82px,.82fr); grid-template-rows: minmax(128px,1fr) minmax(150px,1.35fr) minmax(90px,.8fr); gap: 6px; }
+  .opp-2 { width: 100%; padding-top: 14px; }
+  .opp-2 .seat-topline { align-items: center; flex-direction: column; gap: 4px; }
+  .opp-2 .om { flex: none; justify-content: center; }
+  .opp-2 .river { grid-template-columns: repeat(8,var(--river-w)); }
+  .seat-topline { gap: 4px; }
+  .player-card { min-width: 0; gap: 4px; padding: 3px 6px 3px 3px; }
+  .avatar { width: 28px; height: 28px; border-radius: 8px; font-size: 12px; }
+  .oname { max-width: 58px; font-size: 10px; }
+  .coin { font-size: 9px; }
+  .opp-1 .player-card, .opp-3 .player-card { min-width: 0; }
+  .opp-1 .om, .opp-3 .om { gap: 2px; }
+  .meld-mini { gap: 0; padding: 2px; }
+  .meld-mini .tile { width: 13px; height: 18px; }
+  .meld-kind { display: none; }
+  .handbacks { gap: 1px; }
+  .handbacks i { width: 10px; height: 13px; }
+  .river { gap: 2px; }
+  .opp-1 .river, .opp-3 .river { grid-template-columns: repeat(3,var(--river-w)); }
+  .rr-0 .river { grid-template-columns: repeat(10,var(--river-w)); }
+  #compass { width: 108px; height: 88px; }
+  .compass-core { inset: 15px 26px; }
+  #cbCount { font-size: 21px; }
+  .wind-t, .wind-b { left: 45px; }
+  .wind-r, .wind-l { top: 35px; }
+  #turnHint { bottom: 2px; font-size: 9px; }
+  #myArea { padding: 3px 7px calc(6px + env(safe-area-inset-bottom)); }
+  #myTop { height: 43px; gap: 7px; }
+  #myAvatar { width: 33px; height: 33px; border-radius: 9px; font-size: 14px; }
+  .my-name-line { max-width: 72px; font-size: 10px; }
+  #myCoin { font-size: 10px; }
+  #myMelds .tile, #myMelds .meld-mini .tile { width: 18px; height: 25px; }
+  #myMelds .meld-mini { padding: 2px; }
+  .mlabel { font-size: 9px; }
+  #handTip { display: none; }
+  #myHand {
+    --tw: var(--hand-tw);
+    width: calc(var(--tw) * 7 + 22px);
+    max-width: 100%;
+    min-height: calc(var(--tw) * 2.72 + 11px);
+    margin: 0 auto;
+    align-content: flex-end;
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+  #myHand .tile { margin: 1px .5px; border-radius: 5px; }
+  #myHand .tile.sel { z-index: 3; }
+  #myHand .tile.drawn { margin-left: 4px; }
+  .tile.wild::after { top: -5px; right: -4px; width: 13px; height: 13px; font-size: 7px; }
+  #chatFab { right: 10px; width: 40px; height: 40px; font-size: 16px; }
+  #statFab { right: 10px; width: 40px; height: 40px; font-size: 13px; }
+  #chatPanel { right: 10px; }
+  .panel { padding: 24px 20px; }
+}
+
+@media (max-width: 700px) {
+  #handTip { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* 声音设置弹窗 */
+.snd-sec { margin: 14px 0; }
+.snd-sec .setLabel { margin: 0 0 8px; font-size: 12px; color: #9fb8ab; }
+.snd-toggle { width: 100%; box-sizing: border-box; font-size: 15px; }
+#voiceSel .btn, #bgmSel .btn { flex: 1; width: auto; }
+/* 音量滑条 (拖到最左 = 关) */
+.vol-slider {
+  width: 100%; box-sizing: border-box; height: 34px; margin: 0;
+  -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer;
+  touch-action: pan-x; /* 只横向拖动, 不干扰弹窗滚动 */
+}
+.vol-slider::-webkit-slider-runnable-track {
+  height: 10px; border-radius: 5px;
+  background: linear-gradient(to right, #2f8f5b var(--fill, 50%), #1b2f26 var(--fill, 50%));
+}
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #ffd76e; border: 2px solid #7a5c1e; margin-top: -8px;
+}
+.vol-slider::-moz-range-track { height: 10px; border-radius: 5px; background: #1b2f26; }
+.vol-slider::-moz-range-progress { height: 10px; border-radius: 5px; background: #2f8f5b; }
+.vol-slider::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: #ffd76e; border: 2px solid #7a5c1e; }
+
+/* 横屏: 听牌面板改为顶部下拉, 确保 ✕ 始终在屏幕内可点 */
+@media (max-height: 560px) and (orientation: landscape) {
+  #tingPanel { top: 42px; bottom: auto; max-height: calc(100dvh - 92px); }
+}
+
+/* 语音通话 */
+.js-voice-fab.voice-on { border-color: #6ee7a0; color: #6ee7a0; box-shadow: 0 0 12px rgba(110,231,160,.45); animation: voicePulse 1.6s infinite; }
+@keyframes voicePulse { 0%,100% { box-shadow: 0 0 6px rgba(110,231,160,.3); } 50% { box-shadow: 0 0 14px rgba(110,231,160,.6); } }
+#voiceModal .panel .btn { width: 100%; box-sizing: border-box; margin-top: 10px; }
+#voiceModal #voiceMembers { margin: 10px 0 0; }
+
+/* 微信邀请提醒绑定区 */
+.wx-tip { font-size: 12px; color: #cdbf9d; text-align: left; line-height: 1.7; margin: 6px 2px 2px; }
+#wxQr { width: 138px; margin: 6px auto 2px; border-radius: 8px; border: 1px solid #cbae65; display: none; }
+
+/* ================= v6.6.29 整体美化 (纯增量, 不改原规则) ================= */
+
+/* 弹窗入场: 背景淡入 + 卡片上浮回弹 */
+.modal { animation: modalFade .18s ease-out; }
+.modal .panel { animation: panelIn .24s cubic-bezier(.2,.8,.3,1.08); }
+@keyframes modalFade { from { opacity: 0; } }
+@keyframes panelIn { from { opacity: 0; transform: translateY(16px) scale(.95); } }
+
+/* 悬浮面板入场 (聊天/听牌/语录弹层) */
+#chatPanel:not(.hidden), #tingPanel:not(.hidden) { animation: panelIn .2s cubic-bezier(.2,.8,.3,1.08); }
+#chatQuickPop.open { animation: modalFade .15s ease-out; }
+
+/* toast 入场 */
+#toast { animation: toastIn .22s cubic-bezier(.2,.8,.3,1.1); }
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(.94); } }
+
+/* 滚动条统一: 细金条 */
+.panel::-webkit-scrollbar, .plist::-webkit-scrollbar, #chatList::-webkit-scrollbar,
+.rules-body::-webkit-scrollbar, .stat-list::-webkit-scrollbar, #tingList::-webkit-scrollbar,
+#chatQuickPop::-webkit-scrollbar, #friendList::-webkit-scrollbar { width: 5px; height: 5px; }
+.panel::-webkit-scrollbar-thumb, .plist::-webkit-scrollbar-thumb, #chatList::-webkit-scrollbar-thumb,
+.rules-body::-webkit-scrollbar-thumb, .stat-list::-webkit-scrollbar-thumb, #tingList::-webkit-scrollbar-thumb,
+#chatQuickPop::-webkit-scrollbar-thumb, #friendList::-webkit-scrollbar-thumb { border-radius: 3px; background: rgba(231,197,120,.32); }
+.panel::-webkit-scrollbar-track, .plist::-webkit-scrollbar-track, #chatList::-webkit-scrollbar-track,
+.rules-body::-webkit-scrollbar-track, .stat-list::-webkit-scrollbar-track, #tingList::-webkit-scrollbar-track,
+#chatQuickPop::-webkit-scrollbar-track, #friendList::-webkit-scrollbar-track { background: transparent; }
+
+/* 玩家/好友列表行: 触感反馈 + 细腻分隔 */
+.plist li { transition: background .15s, border-color .15s, transform .1s; }
+.plist li:active { background: rgba(231,197,120,.13); border-color: rgba(231,197,120,.3); }
+#lobbyPlayers li { position: relative; padding-left: 16px; }
+#lobbyPlayers li::before { content: ""; position: absolute; left: 5px; top: 50%; width: 4px; height: 4px; transform: translateY(-50%); border-radius: 50%; background: rgba(231,197,120,.5); }
+
+/* 头像可点反馈 */
+.avatar { transition: box-shadow .18s, filter .18s; }
+.avatar:active { box-shadow: 0 0 0 3px rgba(231,197,120,.4); filter: brightness(1.12); }
+
+/* 互动弹窗: 道具按钮 3 列网格, 图标居中大按钮 */
+#pActRow { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+#pActRow .btn { width: 100%; margin: 0; padding: 12px 4px; font-size: 14px; border-radius: 13px; }
+#pActRow .btn:active { transform: scale(.95); }
+#pActModal .panel { width: min(92vw, 360px); }
+
+/* 首页主按钮: 柔和金光呼吸 */
+#btnCreate { box-shadow: 0 5px 16px rgba(0,0,0,.25), inset 0 1px #fff2c9, 0 0 0 0 rgba(245,217,142,0); animation: createGlow 3.2s ease-in-out infinite; }
+@keyframes createGlow { 50% { box-shadow: 0 5px 16px rgba(0,0,0,.25), inset 0 1px #fff2c9, 0 0 22px 2px rgba(245,217,142,.28); } }
+
+/* 聊天气泡: 轻阴影更立体 */
+.cm-bubble { box-shadow: 0 2px 6px rgba(0,0,0,.18); }
+
+/* 房号: 等宽数字更易读 */
+.code { font-variant-numeric: tabular-nums; }
+
+/* 互动飞行动画元素 (头像间道具飞行) */
+.ia-fly, .ia-burst { position: fixed; z-index: 300; pointer-events: none; transform: translate(-50%,-50%); text-shadow: 0 3px 10px rgba(0,0,0,.45); will-change: transform, opacity; }
+.ia-fly { font-size: 38px; }
+.ia-burst { font-size: 46px; }
+
+/* ================= v6.6.32 管理面板好友列表 → 首页同款内嵌滚动 ================= */
+#manageFriendList { max-height: 180px; overflow-y: auto; }
+#manageFriendList li { display: flex; align-items: center; gap: 6px; margin: 0; padding: 8px 4px; border: none; border-bottom: 1px dashed rgba(255,255,255,.1); border-radius: 0; background: transparent; }
+#manageFriendList li:active { background: rgba(231,197,120,.1); border-bottom-color: rgba(231,197,120,.3); }
+#manageFriendList li .fname { flex: 1; text-align: left; }
+#manageFriendList li .fstatus { color: #9aaba5; font-size: 12px; }
+#manageFriendList li .fstatus.on { color: #8bd5ac; }
+#manageFriendList li.empty { justify-content: center; color: #91a29c; font-size: 13px; }
+
+/* ================= v6.6.34 横屏舒适化: 首页/大厅双栏 (竖屏完全不变) ================= */
+.bot-row .btn { margin: 4px 0; }
+
+@media (orientation: landscape) and (min-width: 700px) {
+  /* 首页: 左栏品牌+登录+建房, 右栏好友+规则 */
+  #home .panel {
+    display: grid;
+    grid-template-columns: 1.08fr .92fr;
+    column-gap: 30px;
+    align-content: center;
+    width: min(92vw, 820px);
+    max-height: calc(100dvh - 36px);
+    overflow-y: auto;
+  }
+  #home .home-main { grid-column: 1; min-width: 0; }
+  #home .home-side { grid-column: 2; align-self: center; min-width: 0; }
+  #home .home-side .divider { margin-top: 0; }
+  #home #btnRules { width: 100%; }
+
+  /* 大厅: 左栏房号+玩家列表, 右栏操作按钮 */
+  #lobby .panel {
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    column-gap: 30px;
+    align-content: center;
+    width: min(92vw, 840px);
+    max-height: calc(100dvh - 36px);
+    overflow-y: auto;
+    text-align: left;
+  }
+  #lobby .lobby-main { grid-column: 1; min-width: 0; display: flex; flex-direction: column; }
+  #lobby .lobby-actions { grid-column: 2; display: flex; flex-direction: column; justify-content: center; align-self: stretch; }
+  #lobby .lobby-actions .btn { margin: 5px 0; }
+  #lobby #lobbyPlayers { flex: 1; max-height: 52dvh; overflow-y: auto; }
+  #lobby .bot-row { display: flex; gap: 8px; }
+  #lobby .bot-row .btn { flex: 1; width: auto; min-width: 0; font-size: 14px; padding: 11px 6px; }
+}
+
+/* ================= v6.6.34b 横屏矮视口(手机横屏)内容压缩: 首页/大厅一屏放下不滚动 ================= */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 560px) {
+  /* 首页 */
+  #home .panel { padding: 14px 22px 16px; }
+  #home .brand-mark { width: 44px; height: 44px; border-radius: 13px; font-size: 24px; margin-bottom: 7px; }
+  #home h1 { font-size: 22px; letter-spacing: 3px; }
+  #home .brand-sub { margin-top: 3px; font-size: 11px; letter-spacing: 2px; }
+  #home .sub { font-size: 11px; margin: 5px 0 0; }
+  #home input { padding: 8px 12px; font-size: 15px; margin: 5px 0 8px; }
+  #home .tabs { margin-bottom: 8px; }
+  #home .tab { padding: 6px; }
+  #home .userbar { margin-bottom: 8px; padding: 6px 8px 6px 12px; }
+  #home .home-main .btn, #home .home-side .btn { padding: 9px 12px; font-size: 15px; margin: 4px 0; }
+  #home .divider { margin: 10px 0 8px; }
+  #home #friendList { max-height: 118px; }
+  #home .panel .plist li { padding: 7px 9px; font-size: 14px; }
+  /* 大厅 */
+  #lobby .panel { padding: 14px 22px 16px; }
+  #lobby h2 { font-size: 19px; margin-bottom: 5px; }
+  #lobby .sub { font-size: 12px; margin: 4px 0; }
+  #lobby .lobby-actions .btn { padding: 9px 12px; font-size: 15px; margin: 4px 0; }
+  #lobby .bot-row .btn { font-size: 12px; padding: 8px 3px; white-space: nowrap; }
+  #lobby .panel .plist li { padding: 7px 9px; font-size: 14px; }
+  #lobby #lobbyPlayers { max-height: 44dvh; }
+}
+
+/* ================= v6.6.35b 横屏微调: 全屏钮让位 + 双栏视觉优化 ================= */
+@media (orientation: landscape) and (min-width: 700px) {
+  /* 右栏整体下移, 给右上角全屏钮让出专属空间 */
+  #home .home-side { padding-top: 46px; }
+  #lobby .lobby-actions { padding-top: 50px; }
+  /* 双栏之间加细分隔线, 左右关系更清晰 */
+  #home .home-side, #lobby .lobby-actions {
+    border-left: 1px solid rgba(231,197,120,.13);
+    padding-left: 24px;
+  }
+  #home .panel, #lobby .panel { column-gap: 16px; }
+  #home .home-side .divider { margin: 0 0 12px; }
+  #lobby .lobby-main { padding-right: 24px; }
+  /* 全屏钮收窄一点, 融入角落 */
+  #home .panel > .fs-btn, #lobby .panel > .fs-btn { top: 12px; right: 14px; width: 32px; height: 32px; font-size: 15px; opacity: .92; }
+}
+
+/* ================= v6.6.36 横屏再打磨: 聊天加高 / 弹窗适配 / 首页排版平衡 ================= */
+
+/* 超矮视口(微信横屏): 聊天面板近乎全屏, 保证够高可输入 */
+@media (orientation: landscape) and (max-height: 300px) {
+  #chatPanel { bottom: 6px; height: calc(100dvh - 12px); max-height: none; }
+}
+
+/* 横屏矮视口: 通用弹窗压缩 (声音设置/战绩/规则/微信邀请等全部受益) */
+@media (orientation: landscape) and (max-height: 560px) {
+  .modal { padding: 10px; }
+  .modal .panel { max-height: calc(100dvh - 20px); padding: 12px 18px 14px; }
+  .modal .panel h2 { font-size: 19px; margin-bottom: 6px; }
+  .modal .panel input { padding: 7px 12px; font-size: 14px; margin: 4px 0 6px; }
+  .modal .panel .btn { padding: 8px 12px; font-size: 14px; margin: 3px 0; }
+  .modal .panel .plist li { padding: 6px 9px; font-size: 14px; }
+  .modal .panel .divider { margin: 8px 0 6px; }
+}
+
+/* 房间管理弹窗横屏双栏: 左=房号+玩家+加机器人, 右=好友区+房间操作 */
+@media (orientation: landscape) and (min-width: 700px) {
+  #manageModal .panel { display: grid; grid-template-columns: 1.05fr .95fr; column-gap: 20px; align-content: center; width: min(92vw, 800px); }
+  #manageModal .manage-main { grid-column: 1; min-width: 0; }
+  #manageModal .manage-side { grid-column: 2; min-width: 0; border-left: 1px solid rgba(231,197,120,.13); padding-left: 22px; }
+  #manageModal .manage-side .divider { margin-top: 0; }
+  #manageModal .manage-side > .btn { width: 100%; margin: 5px 0; }
+  #manageModal .manage-side .row .btn { width: auto; flex: 0 0 auto; }
+  #manageModal #manageList { max-height: 210px; overflow-y: auto; }
+  #manageModal #manageFriendList { max-height: 150px; }
+  /* 首页左栏垂直居中, 消除右栏更高时左下的空白 */
+  #home .home-main { align-self: center; }
+  #lobby .lobby-main { justify-content: center; }
+}
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 560px) {
+  #manageModal .panel { max-height: calc(100dvh - 20px); }
+  #manageModal #manageList { max-height: 140px; }
+  #manageModal #manageFriendList { max-height: 110px; }
+  /* 首页字号回调: 实测 476px 高度有余量, 压缩别太狠 */
+  #home .brand-mark { width: 56px; height: 56px; border-radius: 16px; font-size: 30px; margin-bottom: 8px; }
+  #home h1 { font-size: 27px; letter-spacing: 4px; }
+  #home .brand-sub { margin-top: 4px; font-size: 12px; }
+  #home .sub { font-size: 12px; }
+  #home input { padding: 9px 14px; font-size: 16px; }
+  #home .home-main .btn, #home .home-side .btn { padding: 10px 14px; font-size: 16px; }
+  #home #friendList { max-height: 140px; }
+  #home .panel .plist li { padding: 8px 10px; font-size: 15px; }
+  #lobby h2 { font-size: 22px; margin-bottom: 6px; }
+  #lobby .lobby-actions .btn { padding: 10px 14px; font-size: 16px; }
+  #lobby .bot-row .btn { font-size: 14px; padding: 9px 6px; }
+  #lobby .panel .plist li { padding: 8px 10px; font-size: 15px; }
+  #lobby #lobbyPlayers { max-height: 40dvh; }
+}
+
+/* ================= v6.6.37 横屏: 面板撑满视口高 + 矮屏真压缩 + 大厅不显示绩聊钮 ================= */
+@media (orientation: landscape) and (min-width: 700px) {
+  /* 绿色面板统一撑满视口高度, 内容垂直居中 —— 首页/大厅观感一致, 不再有"矮一截" */
+  #home .panel, #lobby .panel { min-height: calc(100dvh - 40px); }
+}
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 380px) {
+  /* 真机手机横屏 CSS 高度约 310-340px, 按这个预算压缩 */
+  #home .panel { padding: 10px 20px 12px; }
+  #home .brand-mark { width: 46px; height: 46px; border-radius: 13px; font-size: 25px; margin-bottom: 9px; }
+  #home h1 { font-size: 24px; letter-spacing: 3px; }
+  #home .brand-sub { display: none; } /* 矮屏省一行 */
+  #home .sub { font-size: 11px; margin: 3px 0 13px; }
+  #home input { padding: 11px 12px; font-size: 15px; margin: 4px 0 10px; }
+  #home .userbar { margin-bottom: 10px; padding: 6px 6px 6px 10px; }
+  #home .home-main .btn, #home .home-side .btn { padding: 12px 12px; font-size: 16px; margin: 5px 0; }
+  #home .row { align-items: stretch; margin: 5px 0; }
+  #home .row input, #home .row .btn { margin: 0; }
+  #home .home-side { padding-top: 40px; }
+  #home .divider { margin: 8px 0 6px; }
+  #home #friendList { max-height: 88px; }
+  #home .panel .plist li { padding: 7px 9px; font-size: 14px; }
+  #lobby .panel { padding: 10px 20px 12px; }
+  #lobby h2 { font-size: 20px; margin-bottom: 4px; }
+  #lobby .sub { font-size: 11px; margin: 3px 0; }
+  #lobby .lobby-actions { padding-top: 44px; }
+  #lobby .lobby-actions .btn { padding: 8px 12px; font-size: 15px; margin: 3px 0; }
+  #lobby .bot-row .btn { font-size: 12px; padding: 8px 3px; white-space: nowrap; }
+  #lobby .panel .plist li { padding: 7px 9px; font-size: 14px; }
+  #lobby #lobbyPlayers { flex: 1 1 auto; min-height: 0; max-height: none; }
+}
+
+/* ================= v6.6.38 横屏再修正: 首页副标题呼吸感 / 大厅右栏舒展 / 管理弹窗完整显示 ================= */
+
+/* 矮屏弹窗通用: 防止"居中溢出"导致顶部内容被裁且滚不到(flex 居中的经典坑) */
+@media (orientation: landscape) and (max-height: 560px) {
+  .modal { align-items: flex-start; overflow-y: auto; }
+  .modal .panel { margin: auto; }
+}
+
+/* 首页: "混儿牌·幺九必现"小字与下方登录条拉开距离 */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 560px) {
+  #home .sub { margin-bottom: 16px; }
+}
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 380px) {
+  #home .sub { margin-bottom: 9px; }
+}
+
+/* 大厅右栏: 按钮行距拉开, 不再挤成一坨 */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 560px) {
+  #lobby .lobby-actions { gap: 12px; }
+  #lobby .lobby-actions .btn { margin: 0; }
+  #lobby .bot-row { margin: 0; }
+}
+
+/* 房间管理弹窗(横屏矮视口): 面板锁满视口高, 左右两列各自内部滚动
+   —— 修复: 1)标题等顶部内容被裁 2)右列按钮被右边缘裁 3)整页观感 */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 560px) {
+  #manageModal .panel {
+    height: calc(100dvh - 16px);
+    max-height: none;
+    overflow: hidden;
+    align-content: stretch;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  #manageModal .manage-main, #manageModal .manage-side {
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+  /* 列整体滚动后, 取消列表自身定死的高度 */
+  #manageModal #manageList, #manageModal #manageFriendList { max-height: none; overflow: visible; }
+  #manageModal .manage-main h2 { margin-top: 2px; }
+  #manageModal .manage-side .divider { margin-bottom: 8px; }
+}
+
+/* 超矮屏(真机横屏): 管理弹窗再压一档, 尽量一屏放下免滚动 */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 380px) {
+  #manageModal .panel { padding: 9px 14px 10px; }
+  #manageModal .manage-main h2 { font-size: 17px; margin-bottom: 4px; }
+  #manageModal .manage-main .sub { font-size: 11px; margin: 3px 0; }
+  #manageModal .panel .btn { padding: 7px 10px; font-size: 13px; margin: 3px 0; }
+  #manageModal .panel .plist li { padding: 6px 8px; font-size: 13px; }
+  #manageModal .manage-side .divider { margin: 0 0 6px; }
+  #manageModal .code-row .mini { padding: 5px 8px; }
+}
+
+/* 超矮屏: 右列去掉冗余"关闭"大按钮(右上角✕仍在), 空提示收短, 保证一屏完整 */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 380px) {
+  #manageModal #btnManageClose { display: none; }
+  #manageModal .plist li.empty { font-size: 11px; padding: 5px 8px; }
+  #manageModal .manage-side .divider { margin-top: 2px; }
+}
+
+/* ================= v6.6.38b: 首页左栏间距微放宽 + 管理弹窗好友列表恢复内嵌滚动 ================= */
+
+/* 首页左栏: 略微放宽竖向间距, 不再局促 (仅横屏矮屏) */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 380px) {
+  #home .brand-mark { margin-bottom: 8px; }
+  #home .sub { margin-bottom: 12px; }
+  #home .userbar { margin-bottom: 9px; }
+  #home input { margin: 4px 0 10px; }
+  #home .home-main .btn, #home .home-side .btn { margin: 5px 0; }
+  #home .divider { margin: 10px 0 8px; }
+}
+
+/* 管理弹窗(横屏矮屏): 整列不再滚动, 改为 玩家/好友列表自身内嵌滚动, 底部按钮始终可见 */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 560px) {
+  #manageModal .manage-main, #manageModal .manage-side {
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    padding-right: 5px;
+  }
+  #manageModal #manageList, #manageModal #manageFriendList {
+    flex: 1; min-height: 44px; max-height: none; overflow-y: auto; margin: 4px 0;
+  }
+  #manageModal .manage-main .sub { flex: none; }
+  #manageModal .manage-side .divider { flex: none; }
+}
+
+/* ================= v6.6.38c: 管理弹窗去掉冗余"邀请好友进房"大按钮 ================= */
+/* 每个好友行已有"邀请"按钮, 该大按钮是重复入口 (JS 保留, 仅隐藏) */
+#btnManageInvite { display: none !important; }
+
+/* ================= v6.6.38d: 大厅玩家列表自适应剩余高度, 4人满员无需滚动 ================= */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 380px) {
+  #lobby #lobbyPlayers { flex: 1 1 auto; min-height: 0; max-height: none; }
+}
+
+/* ================= v6.6.38e: 首页输入框/按钮加高 + 声音设置弹窗横屏双列 ================= */
+
+/* 首页: 创建房间/输房号加入加高一点, 更好点按 (横屏) */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 560px) {
+  #home input { padding: 14px 14px; font-size: 17px; }
+  #home .home-main .btn, #home .home-side .btn { padding: 15px 14px; font-size: 17px; }
+  #home .row { align-items: stretch; }
+  #home .row input, #home .row .btn { margin: 0; }
+  #home .row { margin: 6px 0; }
+}
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 380px) {
+  #home input { padding: 10px 12px; font-size: 15px; }
+  #home .home-main .btn, #home .home-side .btn { padding: 11px 12px; font-size: 15px; }
+}
+
+/* 声音设置弹窗横屏: 标题通栏居中; 左列=总开关(标题下独立一行)+背景音乐+语音播报, 右列=音效开关+好的 */
+@media (orientation: landscape) and (min-width: 700px) {
+  #soundModal .panel { display: grid; grid-template-columns: 1.15fr .85fr; grid-template-rows: auto 1fr; column-gap: 26px; width: min(90vw, 690px); min-height: calc(100dvh - 40px); }
+  #soundModal .panel > h2 { grid-column: 1 / -1; margin: 0 0 2px; text-align: center; }
+  #soundModal .snd-col { display: flex; flex-direction: column; min-width: 0; }
+  #soundModal .snd-col-l { grid-column: 1; justify-content: space-between; }
+  #soundModal .snd-col-r { grid-column: 2; }
+  /* 总开关: 标题下方正常通栏一行 */
+  #soundModal .snd-col-l .snd-sec:first-child { margin: 4px 0 0; }
+  #soundModal .snd-col-l .snd-sec:first-child .btn { margin: 0; }
+  /* 两块之间收拢, 两条滑条别隔太远 */
+  #soundModal .snd-col .snd-sec { margin: 8px 0 0; }
+  #soundModal .snd-col .snd-sec .setLabel { margin: 0 0 5px; font-size: 13px; }
+  #soundModal .vol-slider { height: 32px; margin: 4px 0; }
+  #soundModal .snd-col .snd-sec .btn { padding: 12px 12px; margin: 4px 0; }
+  /* 右列: 音效开关三钮随列高均分拉高(彼此等高), 「好的」正常高贴列底, 左右总高一致 */
+  #soundModal .snd-col-r .snd-sec { flex: 1; display: flex; flex-direction: column; }
+  #soundModal .snd-col-r .snd-sec .setLabel { flex: 0 0 auto; }
+  #soundModal .snd-col-r .snd-sec .btn { flex: 1 1 0; white-space: nowrap; }
+  #soundModal #btnSoundClose { flex: 0 0 auto; margin: 8px 0 0; width: 100%; }
+}
+/* 超矮屏(317px): 绿框收一点, 标题加大, 按钮加高, 三块间距收紧; 男/女声独立一行在滑条下方 */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 380px) {
+  #soundModal .panel { width: min(86vw, 640px); min-height: calc(100dvh - 40px); max-height: calc(100dvh - 12px); overflow-y: auto; padding: 8px 14px 10px; column-gap: 20px; }
+  #soundModal .panel > h2 { font-size: 17px; margin-bottom: 0; }
+  #soundModal .snd-col .snd-sec { margin: 7px 0 0; }
+  /* 左列纵向均分: 三块间距相等且小(内容已加高, 残余空间有限), 底部与右列「好的」平齐;
+     总开关与标题间留固定适当距离 */
+  #soundModal .snd-col-l { justify-content: space-between; }
+  #soundModal .snd-col-l .snd-sec:first-child { margin-top: 10px; }
+  #soundModal .snd-col .snd-sec .setLabel { margin: 0 0 1px; font-size: 12px; }
+  #soundModal .vol-slider { height: 28px; margin: 2px 0; }
+  #soundModal .snd-col .snd-sec .btn { padding: 10px 8px; font-size: 13px; margin: 3px 0; }
+  #soundModal .snd-col-l .snd-sec:first-child .btn { padding: 12px 8px; }
+  #soundModal #btnSoundClose { padding: 11px 8px; font-size: 13px; margin: 6px 0 0; }
+}
+
+/* ================= v6.6.39c: 矮屏压缩最终覆盖 (需位于所有 560 档规则之后才能生效) ================= */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 380px) {
+  /* 真机手机横屏 CSS 高度约 310-340px, 按这个预算压缩 */
+  #home .panel, #lobby .panel { align-content: start; }
+  #home .panel { padding: 10px 20px 12px; }
+  #home .brand-mark { width: 46px; height: 46px; border-radius: 13px; font-size: 25px; margin-bottom: 9px; }
+  #home h1 { font-size: 24px; letter-spacing: 3px; }
+  #home .brand-sub { display: none; } /* 矮屏省一行 */
+  #home .sub { font-size: 11px; margin: 3px 0 13px; }
+  #home input { padding: 11px 12px; font-size: 15px; margin: 4px 0 10px; }
+  #home .userbar { margin-bottom: 10px; padding: 6px 6px 6px 10px; }
+  #home .home-main .btn, #home .home-side .btn { padding: 12px 12px; font-size: 16px; margin: 5px 0; }
+  #home .row { align-items: stretch; margin: 5px 0; }
+  #home .row input, #home .row .btn { margin: 0; }
+  #home .home-side { padding-top: 40px; }
+  #home .divider { margin: 8px 0 6px; }
+  #home #friendList { max-height: 88px; }
+  #home .panel .plist li { padding: 7px 9px; font-size: 14px; }
+  #lobby .panel { padding: 10px 20px 12px; }
+  #lobby h2 { font-size: 20px; margin-bottom: 4px; }
+  #lobby .sub { font-size: 11px; margin: 3px 0; }
+  #lobby .lobby-actions { padding-top: 44px; }
+  #lobby .lobby-actions .btn { padding: 8px 12px; font-size: 15px; margin: 3px 0; }
+  #lobby .bot-row .btn { font-size: 12px; padding: 8px 3px; white-space: nowrap; }
+  #lobby .panel .plist li { padding: 7px 9px; font-size: 14px; }
+  #lobby #lobbyPlayers { flex: 1 1 auto; min-height: 0; max-height: none; }
+}
+
+/* ================= v6.6.40: 首页创建/加入间距高度微调 (最终覆盖, 位于所有同名规则之后) ================= */
+/* 创建房间与输房号加入拉开间距; 创建房间加高一点, 输房号加入行变矮一点点 */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 560px) {
+  #home #btnCreate { padding: 17px 14px; }
+  #home .join-row { margin-top: 12px; }
+  #home .join-row input { padding: 11px 14px; font-size: 16px; }
+  #home .join-row .btn { padding: 11px 14px; font-size: 16px; }
+}
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 380px) {
+  #home #btnCreate { padding: 14px 12px; }
+  #home .join-row { margin-top: 12px; }
+  #home .join-row input, #home .join-row .btn { padding: 9px 12px; }
+}
+
+/* ================= v6.6.43/45: 大厅隐藏冗余邀请按钮 + AI 三钮竖排; 首页好友列表回退为定高内嵌滚动 ================= */
+/* 房间管理面板已有邀请入口, 大厅「邀请好友进房」冗余, 隐藏 (JS 保留可随时恢复) */
+#btnInviteF { display: none !important; }
+@media (orientation: landscape) and (min-width: 700px) {
+  /* 大厅: 三个 AI 按钮竖排 */
+  #lobby .bot-row { flex-direction: column; gap: 8px; }
+  #lobby .bot-row .btn { width: 100%; padding: 9px 10px; }
+}
+/* 首页右栏(v6.6.45 回退 flex 填充方案): 好友列表恢复定高内嵌滚动, 380 档上限 88→118px 加高一点点;
+   空的 #homeErr 占位(28px)与列表下边距(18px)才是「列表和玩法规则间大空隙」的来源, 一并压掉 */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 380px) {
+  #home #friendList { max-height: 118px; margin-bottom: 8px; }
+  #home #homeErr { min-height: 0; margin-top: 0; }
+}
